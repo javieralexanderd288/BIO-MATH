@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIO-MATH: El Dominio Escolar - COBACH Tapachula</title>
+    <style>
+        :root {
+            --bg-deep: #080910;
+            --panel-bg: #141625;
+            --panel-border: #232742;
+            --accent-gold: #f39c12;
+            --accent-glow: rgba(243, 156, 18, 0.3);
+            --btn-blue: #2980b9;
+            --btn-green: #27ae60;
+            --btn-orange: #d35400;
+            --btn-purple: #8e44ad;
+            --btn-teal: #16a085;
+            --btn-red: #c0392b;
+            --btn-gray: #7f8c8d;
+            --text-main: #ffffff;
+            --text-muted: #a0a0b2;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #121526 0%, var(--bg-deep) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .screen {
+            width: 100%;
+            max-width: 960px;
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(41, 128, 185, 0.1);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .portada-badge {
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            color: var(--text-main);
+            text-align: center;
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            color: var(--accent-gold);
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .portada-desc {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            max-width: 600px;
+        }
+
+        .menu-buttons {
+            width: 100%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        .btn:active { 
+            transform: scale(0.96); 
+            filter: brightness(0.9);
+        }
+
+        .btn-blue { background: linear-gradient(135deg, #2980b9, #1f618d); }
+        .btn-green { background: linear-gradient(135deg, #27ae60, #1e8449); }
+        .btn-orange { background: linear-gradient(135deg, #e67e22, #ca6f1e); }
+        .btn-purple { background: linear-gradient(135deg, #8e44ad, #6c3483); }
+        .btn-teal { background: linear-gradient(135deg, #16a085, #117864); }
+        .btn-gray { background: linear-gradient(135deg, #7f8c8d, #626a6b); }
+        .btn-red { background: linear-gradient(135deg, #c0392b, #962d22); }
+
+        .game-topbar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 20px;
+        }
+
+        @media (min-width: 820px) {
+            #game-container { flex-direction: row; }
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(9, 1fr);
+            gap: 3px;
+            width: 100%;
+            max-width: 520px;
+            aspect-ratio: 1 / 1;
+            background: #1a1d2e;
+            border: 3px solid #2a2f4c;
+            border-radius: 12px;
+            padding: 4px;
+            margin: 0 auto;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .cell {
+            background: #252b43;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-align: center;
+            position: relative;
+            color: white;
+            padding: 2px;
+            filter: saturate(0.85);
+            box-shadow: inset 0 0 4px rgba(255,255,255,0.05);
+            overflow: visible;
+        }
+
+        .center-cell {
+            grid-column: 2 / 9;
+            grid-row: 2 / 9;
+            background: #0d0f1a;
+            border: 2px dashed #2a2f4c;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .player-token {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            position: absolute;
+            box-shadow: 0 0 8px rgba(0,0,0,0.9), 0 0 4px rgba(255,255,255,0.8);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        #controls-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card {
+            background: #1b1e30;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .dice-box {
+            width: 70px;
+            height: 70px;
+            background: #ffffff;
+            border-radius: 14px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 10px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.9);
+            margin: 10px auto;
+            border: 2px solid #bdc3c7;
+        }
+
+        .dice-dot {
+            background: #2c3e50;
+            border-radius: 50%;
+            width: 10px;
+            height: 10px;
+            align-self: center;
+            justify-self: center;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(4, 5, 9, 0.85);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            border-radius: 14px;
+            padding: 24px;
+            max-width: 480px;
+            width: 100%;
+            border: 1px solid var(--accent-gold);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .input-group {
+            margin: 12px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #3b4261;
+            background: #0d0f1a;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        input[type="text"]:focus { border-color: var(--accent-gold); }
+
+        .save-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e2237;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #2a2f4c;
+        }
+
+        .option-btn {
+            background: #1e2237;
+            border: 1px solid #3b4261;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 6px 0;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+        .option-btn:hover { background: var(--btn-blue); border-color: transparent; }
+        .option-btn:active { transform: scale(0.98); }
+
+        .item-tienda {
+            background: #191c2e;
+            border: 1px solid #2a2f4c;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PORTADA / MENU PRINCIPAL -->
+    <div id="screen-menu" class="screen active">
+        <div class="portada-badge">COBACH Tapachula</div>
+        <h1>BIO-MATH</h1>
+        <h2>El Dominio Escolar</h2>
+        <p class="portada-desc">
+            Plataforma didáctica interactiva para el dominio de Matemáticas (Números Reales) y Biología (ADN y Célula).
+        </p>
+
+        <div class="menu-buttons">
+            <button class="btn btn-blue" onclick="abrirRegistro('2p')">Partida 2 Jugadores (1vs1)</button>
+            <button class="btn btn-green" onclick="abrirRegistro('4p')">Partida 4 Jugadores (Multijugador)</button>
+            <button class="btn btn-purple" onclick="abrirVistaPreviaBanco()">Vista Previa de Preguntas</button>
+            <button class="btn btn-teal" onclick="abrirRanking()">Tabla Acumulativa de Campeones</button>
+            <button class="btn btn-gray" onclick="abrirGestorPartidas()">Gestor de Partidas (Cargar / Borrar)</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE JUEGO -->
+    <div id="screen-game" class="screen">
+        <div class="game-topbar">
+            <button class="btn btn-gray" style="width: auto; padding: 8px 14px; font-size: 0.85rem;" onclick="irAlMenu()">Menú Principal</button>
+            <button class="btn btn-orange" style="width: auto; padding: 8px 14px; font-size: 0.85rem;" onclick="guardarPartidaActual()">Guardar Partida</button>
+        </div>
+
+        <div id="game-container">
+            <div id="board"></div>
+
+            <div id="controls-panel">
+                <div class="card">
+                    <h3 style="color: var(--accent-gold); font-size: 1rem; margin-bottom: 8px;">Marcador Académico</h3>
+                    <div id="players-list"></div>
+                </div>
+
+                <div class="card" style="text-align: center;">
+                    <div id="turn-indicator" style="font-weight: bold; font-size: 1.05rem; margin-bottom: 5px;">Turno: -</div>
+                    <div id="dice-container"></div>
+                    <button id="btn-roll" class="btn btn-green" onclick="lanzarDado()" style="max-width: 220px; margin: 0 auto;">Lanzar Dado (1-6)</button>
+                </div>
+
+                <div class="card" id="question-card" style="display: none;">
+                    <div id="question-title" style="font-weight: bold; color: var(--accent-gold); margin-bottom: 8px;"></div>
+                    <div id="question-text" style="font-size: 0.95rem; margin-bottom: 12px; line-height: 1.4;"></div>
+                    <div id="options-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRO DE NOMBRES -->
+    <div id="modal-names" class="modal">
+        <div class="modal-content">
+            <h2>Registro de Estudiantes</h2>
+            <div id="inputs-container" style="margin: 15px 0;"></div>
+            <button class="btn btn-green" onclick="iniciarJuegoConfirmado()">Comenzar Partida</button>
+            <button class="btn btn-gray" style="margin-top: 8px;" onclick="cerrarModales()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL TIENDA VIRTUAL DE RECOMPENSAS -->
+    <div id="modal-tienda" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--accent-gold);">🛒 Tienda Académica</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 10px;" id="tienda-subtit">Intercambia tus puntos por ventajas:</p>
+
+            <div class="item-tienda">
+                <div>
+                    <strong style="color: #27ae60;">🛡️ Escudo de Examen</strong><br>
+                    <small style="color: var(--text-muted);">Protege tu saldo si fallas la siguiente pregunta.</small>
+                </div>
+                <button class="btn btn-green" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="comprarItem('escudo', 300)">Comprar ($300)</button>
+            </div>
+
+            <div class="item-tienda">
+                <div>
+                    <strong style="color: #2980b9;">🎲 Impulso de Dado (+2)</strong><br>
+                    <small style="color: var(--text-muted);">Avanza 2 casillas adicionales inmediatamente.</small>
+                </div>
+                <button class="btn btn-blue" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="comprarItem('impulso', 200)">Comprar ($200)</button>
+            </div>
+
+            <div class="item-tienda">
+                <div>
+                    <strong style="color: #8e44ad;">📚 Beca de Estudio (+1 Acierto)</strong><br>
+                    <small style="color: var(--text-muted);">Suma 1 acierto directo a tu récord global.</small>
+                </div>
+                <button class="btn btn-purple" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="comprarItem('acierto', 500)">Comprar ($500)</button>
+            </div>
+
+            <button class="btn btn-gray" style="margin-top: 10px;" onclick="cerrarTiendaYContinuar()">Salir de la Tienda</button>
+        </div>
+    </div>
+
+    <!-- MODAL EVENTO ESPECIAL (COMODÍN / BECA / EXAMEN) -->
+    <div id="modal-evento" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 id="evento-titulo" style="color: var(--accent-gold);">¡Casilla Especial!</h2>
+            <p id="evento-desc" style="font-size: 1rem; margin: 15px 0; line-height: 1.4;"></p>
+            <button class="btn btn-blue" onclick="cerrarEventoYContinuar()">Entendido</button>
+        </div>
+    </div>
+
+    <!-- MODAL VISTA PREVIA Y BANCO DE PREGUNTAS -->
+    <div id="modal-banco" class="modal">
+        <div class="modal-content">
+            <h2>Banco de Preguntas</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 12px;">Repaso de preguntas con respuestas correctas:</p>
+            <div id="banco-list" style="max-height: 320px; overflow-y: auto;"></div>
+            <button class="btn btn-gray" style="margin-top: 10px;" onclick="cerrarModales()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- MODAL GESTOR DE PARTIDAS -->
+    <div id="modal-saves" class="modal">
+        <div class="modal-content">
+            <h2>Gestor de Partidas</h2>
+            <div id="saves-list" style="margin: 15px 0;"></div>
+            <button class="btn btn-gray" onclick="cerrarModales()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- MODAL RANKING ACUMULATIVO -->
+    <div id="modal-ranking" class="modal">
+        <div class="modal-content">
+            <h2>Salón de la Fama</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 12px;">Suma total de aciertos por estudiante:</p>
+            <div id="ranking-list" style="margin: 15px 0; max-height: 260px; overflow-y: auto;"></div>
+            <button class="btn btn-gray" onclick="cerrarModales()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        const BANCO_MATEMATICAS = [
+            {p: "¿Qué son los números naturales (N)?", ops: ["a) Los que sirven para contar: 1, 2, 3...", "b) Los que tienen decimales", "c) Los negativos"], c: "a) Los que sirven para contar: 1, 2, 3...", exp: "Son el punto de partida, enteros positivos."},
+            {p: "¿Qué incluye el conjunto Z (enteros)?", ops: ["a) Naturales, negativos y cero", "b) Solo positivos", "c) Solo decimales"], c: "a) Naturales, negativos y cero", exp: "Z = {..., -2, -1, 0, 1, 2, ...}"},
+            {p: "¿Cómo se escribe un número racional Q?", ops: ["a) a/b con b ≠ 0", "b) Con raíz cuadrada", "c) Con pi"], c: "a) a/b con b ≠ 0", exp: "Es la definición formal de un número racional."},
+            {p: "¿Qué tipo de número es pi (π)?", ops: ["a) Irracional, infinito no periódico", "b) Racional", "c) Entero"], c: "a) Irracional, infinito no periódico", exp: "π ≈ 3.14159... no sigue un patrón repetitivo."},
+            {p: "¿Cuál es el resultado de sumar -5 + 8?", ops: ["a) 3", "b) -3", "c) 13"], c: "a) 3", exp: "Signos diferentes se restan y se coloca el signo del mayor."},
+            {p: "¿Cuál es la raíz cuadrada de 81?", ops: ["a) 9", "b) 8", "c) 7"], c: "a) 9", exp: "9 * 9 = 81."},
+            {p: "¿Cuál es el valor absoluto de -15?", ops: ["a) 15", "b) -15", "c) 0"], c: "a) 15", exp: "El valor absoluto mide la distancia al cero, siempre es positivo."},
+            {p: "¿Qué resultado se obtiene al multiplicar -4 por -6?", ops: ["a) 24", "b) -24", "c) 10"], c: "a) 24", exp: "Menos por menos da más."},
+            {p: "¿Cuál es el inverso aditivo de 7?", ops: ["a) -7", "b) 1/7", "c) 0"], c: "a) -7", exp: "El inverso aditivo es el número con signo opuesto tal que su suma sea cero."},
+            {p: "¿Cómo se clasifican los decimales finitos y periódicos?", ops: ["a) Números racionales", "b) Números irracionales", "c) Números primos"], c: "a) Números racionales", exp: "Se pueden expresar como fracción exactas."},
+            {p: "¿Qué es una fracción propia?", ops: ["a) Su numerador es menor que el denominador", "b) El numerador es mayor", "c) Es igual a uno"], c: "a) Su numerador es menor que el denominador", exp: "Representa un valor menor a la unidad."},
+            {p: "¿Cuál es el resultado de 2 al cubo ($2^3$)?", ops: ["a) 8", "b) 6", "c) 9"], c: "a) 8", exp: "2 * 2 * 2 = 8."},
+            {p: "¿Qué representa la recta numérica real?", ops: ["a) La correspondencia entre números y puntos", "b) Solo figuras geométricas", "c) Operaciones de suma"], c: "a) La correspondencia entre números y puntos", exp: "Cada número real tiene una única posición en la recta."},
+            {p: "¿Cuál es el resultado de simplificar 12/24?", ops: ["a) 1/2", "b) 1/4", "c) 2/3"], c: "a) 1/2", exp: "Dividiendo numerador y denominador entre 12."},
+            {p: "¿Qué es el mínimo común múltiplo (mcm)?", ops: ["a) El menor múltiplo común de dos o más números", "b) El mayor divisor", "c) Un número primo"], c: "a) El menor múltiplo común de dos o más números", exp: "Es muy útil para sumar fracciones con distinto denominador."},
+            {p: "¿Cuál es el resultado de 5 + 3 * 2 según la jerarquía?", ops: ["a) 11", "b) 16", "c) 10"], c: "a) 11", exp: "Primero se realiza la multiplicación (3*2=6) y luego la suma (5+6=11)."},
+            {p: "¿Qué es un número primo?", ops: ["a) Divisible solo entre 1 y sí mismo", "b) Divisible entre cualquier número", "c) Todos los impares"], c: "a) Divisible solo entre 1 y sí mismo", exp: "Ejemplos: 2, 3, 5, 7, 11..."},
+            {p: "¿Cómo se expresa el 25% en fracción simplificada?", ops: ["a) 1/4", "b) 1/2", "c) 3/4"], c: "a) 1/4", exp: "25/100 se reduce a 1/4."},
+            {p: "¿Cuál es el resultado de la operación √16 + √9?", ops: ["a) 7", "b) 5", "c) 25"], c: "a) 7", exp: "4 + 3 = 7."},
+            {p: "¿Qué es una proporción geométrica?", ops: ["a) La igualdad de dos razones", "b) Una suma de decimales", "c) Una raíz cuadrada"], c: "a) La igualdad de dos razones", exp: "a/b = c/d."}
+        ];
+
+        const BANCO_BIOLOGIA = [
+            {p: "¿Qué significa las siglas ADN?", ops: ["a) Ácido Desoxirribonucleico", "b) Alta Densidad Natural", "c) Agua De Núcleo"], c: "a) Ácido Desoxirribonucleico", exp: "Es la molécula portadora de la información genética."},
+            {p: "¿Dónde se resguarda el ADN en la célula eucariota?", ops: ["a) En el núcleo celular", "b) En la pared celular", "c) Fuera de la célula"], c: "a) En el núcleo celular", exp: "En eucariotas se encuentra resguardado dentro del núcleo."},
+            {p: "¿Qué función principal cumple la mitocondria?", ops: ["a) Producir energía (ATP)", "b) Realizar fotosíntesis", "c) Guardar agua"], c: "a) Producir energía (ATP)", exp: "Es la central energética de la célula eucariota."},
+            {p: "¿Cuántos cromosomas tiene la célula humana típica?", ops: ["a) 46 cromosomas (23 pares)", "b) 10 cromosomas", "c) 100 cromosomas"], c: "a) 46 cromosomas (23 pares)", exp: "Recibimos 23 de la madre y 23 del padre."},
+            {p: "¿Qué proceso produce 2 células hijas idénticas?", ops: ["a) Mitosis", "b) Meiosis", "c) Fecundación"], c: "a) Mitosis", exp: "Es la división celular para crecimiento y reparación."},
+            {p: "¿Qué organelo realiza la fotosíntesis en células vegetales?", ops: ["a) Cloroplasto", "b) Mitocondria", "c) Ribosoma"], c: "a) Cloroplasto", exp: "Contienen clorofila para captar la luz solar."},
+            {p: "¿Qué biomolécula forma las membranas celulares?", ops: ["a) Lípidos (fosfolípidos)", "b) Carbohidratos", "c) Ácidos nucleicos"], c: "a) Lípidos (fosfolípidos)", exp: "Forman la bicapa lipídica que da estructura y protección."},
+            {p: "¿Cuál es la unidad básica y funcional de la vida?", ops: ["a) La célula", "b) El tejido", "c) El órgano"], c: "a) La célula", exp: "Todo ser vivo está compuesto por células."},
+            {p: "¿Qué tipo de división celular forma gametos (espermatozoides y óvulos)?", ops: ["a) Meiosis", "b) Mitosis", "c) Fisión binaria"], c: "a) Meiosis", exp: "Reduce a la mitad el número de cromosomas (haploides)."},
+            {p: "¿Qué base nitrogenada NO forma parte del ADN?", ops: ["a) Uracilo", "b) Timina", "c) Adenina"], c: "a) Uracilo", exp: "El Uracilo pertenece exclusivamente al ARN."},
+            {p: "¿Qué función tienen los ribosomas en la célula?", ops: ["a) Sintetizar proteínas", "b) Almacenar lípidos", "c) Digerir nutrientes"], c: "a) Sintetizar proteínas", exp: "Traducen el código genético en cadenas de aminoácidos."},
+            {p: "¿Qué organelo se encarga de la digestión celular?", ops: ["a) Lisosoma", "b) Aparato de Golgi", "c) Nucleolo"], c: "a) Lisosoma", exp: "Contienen enzimas digestivas para reciclar estructuras."},
+            {p: "¿Qué es la ósmosis?", ops: ["a) Difusión de agua a través de membrana semipermeable", "b) Entrada de sólidos", "c) Salida de energía"], c: "a) Difusión de agua a través de membrana semipermeable", exp: "Movimiento de solvente desde menor a mayor concentración."},
+            {p: "¿Qué gas se libera durante la fotosíntesis?", ops: ["a) Oxígeno", "b) Dióxido de carbono", "c) Nitrógeno"], c: "a) Oxígeno", exp: "Es un subproducto vital liberado por plantas y algas."},
+            {p: "¿Qué científico descubrió las leyes de la herencia genética?", ops: ["a) Gregor Mendel", "b) Charles Darwin", "c) Louis Pasteur"], c: "a) Gregor Mendel", exp: "Estudió la transmisión de caracteres usando chícharos."},
+            {p: "¿Qué son los organismos autótrofos?", ops: ["a) Los que producen su propio alimento", "b) Los que se alimentan de otros", "c) Los que no respiran"], c: "a) Los que producen su propio alimento", exp: "Ejemplo: plantas mediante fotosíntesis."},
+            {p: "¿Cuál es la función del ARN mensajero (ARNm)?", ops: ["a) Copiar la información del ADN y llevarla al ribosoma", "b) Transportar agua", "c) Dar color a la célula"], c: "a) Copiar la información del ADN y llevarla al ribosoma", exp: "Actúa como intermediario genético."},
+            {p: "¿Qué es un ecosistema?", ops: ["a) Conjunto de factores bióticos y abióticos interactuando", "b) Solo los animales de un bosque", "c) Un tipo de célula"], c: "a) Conjunto de factores bióticos y abióticos interactuando", exp: "Comprende la comunidad viva y su entorno físico."},
+            {p: "¿Qué enzima duplica o sintetiza el ADN?", ops: ["a) ADN polimerasa", "b) Amilasa", "c) Pepsina"], c: "a) ADN polimerasa", exp: "Enzima clave en la replicación celular."},
+            {p: "¿Qué es la biodiversidad?", ops: ["a) La variedad de seres vivos en el planeta", "b) La cantidad de agua oceánica", "c) El clima global"], c: "a) La variedad de seres vivos en el planeta", exp: "Incluye la diversidad genética, de especies y ecosistemas."}
+        ];
+
+        const CASILLAS = [
+            {n: "SAL\n+$200", t: "salida", c: "#27ae60"}, {n: "MAT\nREALES", t: "mat", c: "#2980b9"},
+            {n: "BIO\nADN", t: "bio", c: "#8e44ad"}, {n: "TND\nTIENDA", t: "tienda", c: "#f39c12"},
+            {n: "MAT\nNUM", t: "mat", c: "#2980b9"}, {n: "CMD\nSORPRESA", t: "sorpresa", c: "#d35400"},
+            {n: "BIO\nCELULA", t: "bio", c: "#8e44ad"}, {n: "BIB\nREPASO", t: "carcel", c: "#c0392b"},
+            {n: "MAT\nORDEN", t: "mat", c: "#2980b9"}, {n: "BIO\nGENES", t: "bio", c: "#8e44ad"},
+            {n: "BCA\nBECA", t: "beca", c: "#16a085"}, {n: "MAT\nDENS", t: "mat", c: "#2980b9"},
+            {n: "CMD\nSORPRESA", t: "sorpresa", c: "#d35400"}, {n: "BIO\nMITO", t: "bio", c: "#8e44ad"},
+            {n: "CAF\nDESCANSO", t: "descanso", c: "#7f8c8d"}, {n: "EXM\nPARCIAL", t: "examen", c: "#d35400"},
+            {n: "SAL\nMEDIO", t: "salida", c: "#27ae60"}, {n: "MAT\nENTER", t: "mat", c: "#2980b9"},
+            {n: "BIO\nARN", t: "bio", c: "#8e44ad"}, {n: "TND\nTIENDA", t: "tienda", c: "#f39c12"},
+            {n: "MAT\nRAC", t: "mat", c: "#2980b9"}, {n: "CMD\nSORPRESA", t: "sorpresa", c: "#d35400"},
+            {n: "BIO\nCROM", t: "bio", c: "#8e44ad"}, {n: "BIB\nREPASO", t: "carcel", c: "#c0392b"},
+            {n: "MAT\nIRR", t: "mat", c: "#2980b9"}, {n: "BIO\nECO", t: "bio", c: "#8e44ad"},
+            {n: "BCA\nSUPER", t: "beca", c: "#16a085"}, {n: "MAT\nV.ABS", t: "mat", c: "#2980b9"},
+            {n: "CMD\nSORPRESA", t: "sorpresa", c: "#d35400"}, {n: "BIO\nANAT", t: "bio", c: "#8e44ad"},
+            {n: "EXM\nFINAL", t: "examen", c: "#d35400"}, {n: "MET\nDOMINIO", t: "meta", c: "#c0392b"}
+        ];
+
+        let gameState = { modo: '2p', jugadores: [], turno: 0, preguntaActual: null };
+        const COLORES = ["#3498db", "#e74c3c", "#2ecc71", "#f1c40f"];
+
+        function dibujarDado(val) {
+            const container = document.getElementById("dice-container");
+            container.innerHTML = `<div class="dice-box" id="dice-grid"></div>`;
+            const grid = document.getElementById("dice-grid");
+            
+            const dotMap = {
+                1: [4],
+                2: [0, 8],
+                3: [0, 4, 8],
+                4: [0, 2, 6, 8],
+                5: [0, 2, 4, 6, 8],
+                6: [0, 2, 3, 5, 6, 8]
+            };
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement("div");
+                if (dotMap[val] && dotMap[val].includes(i)) {
+                    const dot = document.createElement("div");
+                    dot.className = "dice-dot";
+                    cell.appendChild(dot);
+                }
+                grid.appendChild(cell);
+            }
+        }
+
+        function inicializarTablero() {
+            const board = document.getElementById("board");
+            board.innerHTML = "";
+            
+            let coords = [];
+            for (let i = 0; i < 9; i++) coords.push({r: 1, c: i + 1});
+            for (let i = 1; i < 9; i++) coords.push({r: i + 1, c: 9});
+            for (let i = 7; i >= 0; i--) coords.push({r: 9, c: i + 1});
+            for (let i = 7; i >= 1; i--) coords.push({r: i + 1, c: 1});
+
+            CASILLAS.forEach((casilla, idx) => {
+                const cell = document.createElement("div");
+                cell.className = "cell";
+                cell.style.gridRow = coords[idx].r;
+                cell.style.gridColumn = coords[idx].c;
+                cell.style.backgroundColor = casilla.c;
+                cell.innerHTML = `<span style="white-space: pre-line; line-height: 1.1;">${casilla.n}</span><div id="tokens-cell-${idx}"></div>`;
+                board.appendChild(cell);
+            });
+
+            const center = document.createElement("div");
+            center.className = "center-cell";
+            center.innerHTML = `<h3 style="color:var(--accent-gold); font-size:0.85rem; margin-bottom:2px;">BIO-MATH</h3><p style="font-size:0.65rem; color:#a0a0b2;">COBACH Tapachula</p>`;
+            board.appendChild(center);
+
+            actualizarFichas();
+        }
+
+        function actualizarFichas() {
+            CASILLAS.forEach((_, idx) => {
+                const container = document.getElementById(`tokens-cell-${idx}`);
+                if (container) container.innerHTML = "";
+            });
+
+            gameState.jugadores.forEach((j, idx) => {
+                const container = document.getElementById(`tokens-cell-${j.pos}`);
+                if (container) {
+                    const token = document.createElement("span");
+                    token.className = "player-token";
+                    token.style.backgroundColor = j.color;
+                    token.style.left = `${(idx * 8) - 2}px`;
+                    token.style.top = "-2px";
+                    container.appendChild(token);
+                }
+            });
+        }
+
+        function abrirRegistro(modo) {
+            gameState.modo = modo;
+            const container = document.getElementById("inputs-container");
+            container.innerHTML = "";
+
+            let cantidad = modo === '4p' ? 4 : 2;
+            for (let i = 0; i < cantidad; i++) {
+                container.innerHTML += `
+                    <div class="input-group">
+                        <label style="color:${COLORES[i]}; font-weight:bold; font-size:0.9rem;">Jugador ${i + 1}:</label>
+                        <input type="text" id="input-name-${i}" value="Estudiante ${i + 1}">
+                    </div>
+                `;
+            }
+
+            document.getElementById("modal-names").style.display = "flex";
+        }
+
+        function iniciarJuegoConfirmado() {
+            let cantidad = gameState.modo === '4p' ? 4 : 2;
+            gameState.jugadores = [];
+
+            for (let i = 0; i < cantidad; i++) {
+                let nombre = document.getElementById(`input-name-${i}`).value.trim() || `Estudiante ${i + 1}`;
+                gameState.jugadores.push({ nombre, pos: 0, puntos: 1500, color: COLORES[i], aciertos: 0, escudo: false });
+            }
+
+            gameState.turno = 0;
+            cerrarModales();
+            
+            document.getElementById("screen-menu").classList.remove("active");
+            document.getElementById("screen-game").classList.add("active");
+
+            inicializarTablero();
+            actualizarMarcador();
+            dibujarDado(1);
+        }
+
+        function actualizarMarcador() {
+            const list = document.getElementById("players-list");
+            list.innerHTML = "";
+
+            gameState.jugadores.forEach((j) => {
+                let escudoTxt = j.escudo ? " 🛡️" : "";
+                list.innerHTML += `
+                    <div style="color:${j.color}; font-size:0.85rem; font-weight:bold; margin:4px 0;">
+                        ${j.nombre}${escudoTxt}: $${j.puntos} | Aciertos: ${j.aciertos}
+                    </div>
+                `;
+            });
+
+            const jActual = gameState.jugadores[gameState.turno % gameState.jugadores.length];
+            document.getElementById("turn-indicator").innerText = `Turno de: ${jActual.nombre}`;
+            document.getElementById("turn-indicator").style.color = jActual.color;
+            document.getElementById("btn-roll").disabled = false;
+        }
+
+        function lanzarDado() {
+            document.getElementById("btn-roll").disabled = true;
+            document.getElementById("question-card").style.display = "none";
+            let paso = 0;
+            let anim = setInterval(() => {
+                let tempVal = Math.floor(Math.random() * 6) + 1;
+                dibujarDado(tempVal);
+                paso++;
+                if (paso > 8) {
+                    clearInterval(anim);
+                    let dadoFinal = Math.floor(Math.random() * 6) + 1;
+                    dibujarDado(dadoFinal);
+                    
+                    let jActual = gameState.jugadores[gameState.turno % gameState.jugadores.length];
+                    jActual.pos = (jActual.pos + dadoFinal) % CASILLAS.length;
+                    actualizarFichas();
+                    setTimeout(() => procesarCasilla(CASILLAS[jActual.pos]), 500);
+                }
+            }, 50);
+        }
+
+        function procesarCasilla(casilla) {
+            let jActual = gameState.jugadores[gameState.turno % gameState.jugadores.length];
+
+            if (casilla.t === "mat" || casilla.t === "bio") {
+                mostrarPregunta(casilla.t);
+            } else if (casilla.t === "tienda") {
+                document.getElementById("tienda-subtit").innerText = `${jActual.nombre}, tienes $${jActual.puntos} disponibles:`;
+                document.getElementById("modal-tienda").style.display = "flex";
+            } else if (casilla.t === "sorpresa") {
+                let sorpresaPuntos = (Math.floor(Math.random() * 3) + 1) * 100;
+                let gana = Math.random() > 0.4;
+                if (gana) {
+                    jActual.puntos += sorpresaPuntos;
+                    mostrarEvento("🎁 ¡Tarjeta Comodín!", `Encontraste un bono académico. ¡Ganas +$${sorpresaPuntos}!`);
+                } else {
+                    jActual.puntos = Math.max(0, jActual.puntos - sorpresaPuntos);
+                    mostrarEvento("⚠️ ¡Tarjeta Comodín!", `Perdiste material escolar. Se descuentan -$${sorpresaPuntos}.`);
+                }
+            } else if (casilla.t === "beca") {
+                jActual.puntos += 300;
+                mostrarEvento("🎓 Beca COBACH", `¡Felicidades! Has recibido una beca por mérito académico +$300.`);
+            } else if (casilla.t === "carcel") {
+                jActual.puntos = Math.max(0, jActual.puntos - 100);
+                mostrarEvento("📚 Biblioteca de Repaso", `Debes repasar tus apuntes. Cuota de inscripción -$100.`);
+            } else if (casilla.t === "examen") {
+                jActual.puntos = Math.max(0, jActual.puntos - 150);
+                mostrarEvento("📝 Examen Sorpresa", `Presentaste un examen extraordinario. Gastos de trámite -$150.`);
+            } else if (casilla.t === "salida") {
+                jActual.puntos += 200;
+                mostrarEvento("🚀 Casilla de Paso", `Paso por casilla de control. ¡Cobras +$200!`);
+            } else if (casilla.t === "meta") {
+                alert(`¡${jActual.nombre} ha alcanzado la META y ganado el juego!`);
+                guardarRanking();
+                irAlMenu();
+                return;
+            } else {
+                finalizarTurno();
+            }
+        }
+
+        function mostrarEvento(titulo, desc) {
+            document.getElementById("evento-titulo").innerText = titulo;
+            document.getElementById("evento-desc").innerText = desc;
+            document.getElementById("modal-evento").style.display = "flex";
+        }
+
+        function cerrarEventoYContinuar() {
+            cerrarModales();
+            finalizarTurno();
+        }
+
+        function comprarItem(tipo, costo) {
+            let jActual = gameState.jugadores[gameState.turno % gameState.jugadores.length];
+            if (jActual.puntos < costo) {
+                alert("No tienes suficientes puntos para esta compra.");
+                return;
+            }
+
+            jActual.puntos -= costo;
+            if (tipo === 'escudo') {
+                jActual.escudo = true;
+                alert("¡Compraste un Escudo de Examen!");
+            } else if (tipo === 'impulso') {
+                jActual.pos = (jActual.pos + 2) % CASILLAS.length;
+                actualizarFichas();
+                alert("¡Te has impulsado 2 casillas hacia adelante!");
+            } else if (tipo === 'acierto') {
+                jActual.aciertos += 1;
+                alert("¡Se ha sumado +1 Acierto a tu récord!");
+            }
+
+            actualizarMarcador();
+            document.getElementById("tienda-subtit").innerText = `${jActual.nombre}, tienes $${jActual.puntos} disponibles:`;
+        }
+
+        function cerrarTiendaYContinuar() {
+            cerrarModales();
+            finalizarTurno();
+        }
+
+        function mostrarPregunta(tipo) {
+            let banco = tipo === "mat" ? BANCO_MATEMATICAS : BANCO_BIOLOGIA;
+            let qRaw = banco[Math.floor(Math.random() * banco.length)];
+            
+            let opcionesMezcladas = [...qRaw.ops];
+            opcionesMezcladas.sort(() => Math.random() - 0.5);
+
+            gameState.preguntaActual = {
+                p: qRaw.p,
+                ops: opcionesMezcladas,
+                correctaTexto: qRaw.c,
+                exp: qRaw.exp
+            };
+
+            const card = document.getElementById("question-card");
+            card.style.display = "block";
+            
+            document.getElementById("question-title").innerText = tipo === "mat" ? "RETO DE MATEMÁTICAS" : "RETO DE BIOLOGÍA";
+            document.getElementById("question-text").innerText = qRaw.p;
+
+            const opts = document.getElementById("options-container");
+            opts.innerHTML = "";
+
+            opcionesMezcladas.forEach((opTexto) => {
+                let btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = opTexto;
+                btn.onclick = () => responder(opTexto);
+                opts.appendChild(btn);
+            });
+        }
+
+        function responder(textoSeleccionado) {
+            let jActual = gameState.jugadores[gameState.turno % gameState.jugadores.length];
+            document.getElementById("question-card").style.display = "none";
+
+            if (textoSeleccionado === gameState.preguntaActual.correctaTexto) {
+                jActual.puntos += 200;
+                jActual.aciertos += 1;
+                alert(`¡CORRECTO! 🎉\n+$200 Puntos Académicos\n\nExplicación: ${gameState.preguntaActual.exp}`);
+            } else {
+                if (jActual.escudo) {
+                    jActual.escudo = false;
+                    alert(`INCORRECTO ❌\n¡Tu Escudo te protegió de perder puntos!\n\nRespuesta correcta: ${gameState.preguntaActual.correctaTexto}\nExplicación: ${gameState.preguntaActual.exp}`);
+                } else {
+                    jActual.puntos = Math.max(0, jActual.puntos - 100);
+                    alert(`INCORRECTO ❌\n-$100 Puntos\n\nRespuesta correcta: ${gameState.preguntaActual.correctaTexto}\nExplicación: ${gameState.preguntaActual.exp}`);
+                }
+            }
+
+            finalizarTurno();
+        }
+
+        function finalizarTurno() {
+            gameState.turno++;
+            actualizarMarcador();
+        }
+
+        function abrirVistaPreviaBanco() {
+            const list = document.getElementById("banco-list");
+            list.innerHTML = "<h4 style='color:var(--accent-gold); margin-bottom:6px;'>Matemáticas:</h4>";
+            
+            BANCO_MATEMATICAS.forEach((q, i) => {
+                list.innerHTML += `
+                    <div style="background:#191c2e; padding:8px; border-radius:6px; margin-bottom:6px; font-size:0.85rem;">
+                        <strong>${i+1}. ${q.p}</strong><br>
+                        <span style="color:#27ae60;">Correcta: ${q.c}</span>
+                    </div>
+                `;
+            });
+
+            list.innerHTML += "<h4 style='color:var(--accent-gold); margin:12px 0 6px 0;'>Biología:</h4>";
+            BANCO_BIOLOGIA.forEach((q, i) => {
+                list.innerHTML += `
+                    <div style="background:#191c2e; padding:8px; border-radius:6px; margin-bottom:6px; font-size:0.85rem;">
+                        <strong>${i+1}. ${q.p}</strong><br>
+                        <span style="color:#27ae60;">Correcta: ${q.c}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById("modal-banco").style.display = "flex";
+        }
+
+        function guardarPartidaActual() {
+            let partidas = JSON.parse(localStorage.getItem("biomath_saves") || "[]");
+            let nombreGuardado = prompt("Nombre para guardar esta partida:", `Partida ${partidas.length + 1}`);
+
+            if (nombreGuardado) {
+                partidas.push({ id: Date.now(), nombre: nombreGuardado, data: gameState });
+                localStorage.setItem("biomath_saves", JSON.stringify(partidas));
+                alert("¡Partida guardada con éxito!");
+            }
+        }
+
+        function abrirGestorPartidas() {
+            const list = document.getElementById("saves-list");
+            list.innerHTML = "";
+            let partidas = JSON.parse(localStorage.getItem("biomath_saves") || "[]");
+
+            if (partidas.length === 0) {
+                list.innerHTML = `<p style="text-align:center; color:var(--text-muted);">No hay partidas guardadas.</p>`;
+            } else {
+                partidas.forEach((item) => {
+                    list.innerHTML += `
+                        <div class="save-item">
+                            <span style="font-weight:600; font-size:0.9rem;">${item.nombre}</span>
+                            <div>
+                                <button class="btn btn-green" style="width:auto; padding:5px 10px; font-size:0.75rem; display:inline-block;" onclick="cargarPartida(${item.id})">Cargar</button>
+                                <button class="btn btn-red" style="width:auto; padding:5px 10px; font-size:0.75rem; display:inline-block;" onclick="borrarPartida(${item.id})">Borrar</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById("modal-saves").style.display = "flex";
+        }
+
+        function cargarPartida(id) {
+            let partidas = JSON.parse(localStorage.getItem("biomath_saves") || "[]");
+            let p = partidas.find(x => x.id === id);
+
+            if (p) {
+                gameState = p.data;
+                cerrarModales();
+                document.getElementById("screen-menu").classList.remove("active");
+                document.getElementById("screen-game").classList.add("active");
+                inicializarTablero();
+                actualizarMarcador();
+                dibujarDado(1);
+            }
+        }
+
+        function borrarPartida(id) {
+            if (confirm("¿Estás seguro de que deseas borrar esta partida?")) {
+                let partidas = JSON.parse(localStorage.getItem("biomath_saves") || "[]");
+                partidas = partidas.filter(x => x.id !== id);
+                localStorage.setItem("biomath_saves", JSON.stringify(partidas));
+                abrirGestorPartidas();
+            }
+        }
+
+        function guardarRanking() {
+            let ranking = JSON.parse(localStorage.getItem("biomath_ranking") || "{}");
+            gameState.jugadores.forEach(j => {
+                ranking[j.nombre] = (ranking[j.nombre] || 0) + j.aciertos;
+            });
+            localStorage.setItem("biomath_ranking", JSON.stringify(ranking));
+        }
+
+        function abrirRanking() {
+            let ranking = JSON.parse(localStorage.getItem("biomath_ranking") || "{}");
+            const list = document.getElementById("ranking-list");
+            list.innerHTML = "";
+
+            let sorted = Object.entries(ranking).sort((a, b) => b[1] - a[1]);
+
+            if (sorted.length === 0) {
+                list.innerHTML = `<p style="text-align:center; color:var(--text-muted);">Sin registros acumulados aún.</p>`;
+            } else {
+                sorted.forEach(([nombre, aciertos], idx) => {
+                    let medalla = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : `${idx + 1}.`));
+                    list.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #232742; font-size:0.9rem;">
+                            <span>${medalla} ${nombre}</span>
+                            <span style="color:var(--accent-gold); font-weight:bold;">${aciertos} aciertos</span>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById("modal-ranking").style.display = "flex";
+        }
+
+        function cerrarModales() {
+            document.querySelectorAll(".modal").forEach(m => m.style.display = "none");
+        }
+
+        function irAlMenu() {
+            document.getElementById("screen-game").classList.remove("active");
+            document.getElementById("screen-menu").classList.add("active");
+        }
+    </script>
+</body>
+</html>
